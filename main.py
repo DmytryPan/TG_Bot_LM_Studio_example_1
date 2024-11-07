@@ -4,8 +4,11 @@ import jsons
 from Class_ModelResponse import ModelResponse
 
 # Замените 'YOUR_BOT_TOKEN' на ваш токен от BotFather
-API_TOKEN = 'YOUR_BOT_TOKEN'
+API_TOKEN = '7929887399:AAH30pE1Gi-YVFY6wqWkvVkCB-AMWIDRh5k'
 bot = telebot.TeleBot(API_TOKEN)
+
+# Контексты диалога с пользователями
+user_contexts = {}
 
 # Команды
 @bot.message_handler(commands=['start'])
@@ -15,6 +18,7 @@ def send_welcome(message):
         "Доступные команды:\n"
         "/start - вывод всех доступных команд\n"
         "/model - выводит название используемой языковой модели\n"
+        "/clear - очищает контекст нашего разговора"
         "Отправьте любое сообщение, и я отвечу с помощью LLM модели."
     )
     bot.reply_to(message, welcome_text)
