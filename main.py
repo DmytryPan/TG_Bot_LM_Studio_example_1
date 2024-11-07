@@ -18,7 +18,7 @@ def send_welcome(message):
         "Доступные команды:\n"
         "/start - вывод всех доступных команд\n"
         "/model - выводит название используемой языковой модели\n"
-        "/clear - очищает контекст нашего разговора"
+        "/clear - очищает контекст нашего разговора\n"
         "Отправьте любое сообщение, и я отвечу с помощью LLM модели."
     )
     bot.reply_to(message, welcome_text)
@@ -46,14 +46,15 @@ def send_model_name(message):
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
+    user_id = message.from_user.id # сохраняем id пользователя
     user_query = message.text
+
+    if user_id not in user_contexts:
+        user_contexts[user_id] = []
+    user_contexts[user_id].append({'role':'user', 'content':user_query}) # сохраняем сообщение пользователя 
+
     request = {
-        "messages": [
-          {
-            "role": "user",
-            "content": message.text
-          },
-    ]
+        "messages":user_contexts[user_id]
   }
     response = requests.post(
         'http://localhost:1234/v1/chat/completions',
@@ -62,7 +63,9 @@ def handle_message(message):
 
     if response.status_code == 200:
         model_response :ModelResponse = jsons.loads(response.text, ModelResponse)
-        bot.reply_to(message, model_response.choices[0].message.content)
+        bot_reply = model_response.choices[0].message.content
+        user_contexts[user_id].append({'role':'assistant', 'content':bot_reply})
+        bot.reply_to(message, bot_reply)
     else:
         bot.reply_to(message, 'Произошла ошибка при обращении к модели.')
 
