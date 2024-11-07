@@ -24,6 +24,13 @@ def send_welcome(message):
     bot.reply_to(message, welcome_text)
 
 
+@bot.message_handler(commands=['clear'])
+def clear_context(message):
+    user_id = message.from_user.id
+    if user_id in user_contexts:
+        del user_contexts[user_id]
+    bot.reply_to(message, 'Контекст диалога очищен.')
+
 @bot.message_handler(commands=['model'])
 def send_model_name(message):
     # Отправляем запрос к LM Studio для получения информации о модели
